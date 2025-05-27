@@ -244,19 +244,19 @@ public class Level {
 				numSquaresToFill--;
 			}
 			//down
-			if(row > 0 && !map.getTiles()[col][row + 1].isSolid() && !(map.getTiles()[col][row + 1] instanceof Gas)){
+			if(numSquaresToFill > 0 && row > 0 && !map.getTiles()[col][row + 1].isSolid() && !(map.getTiles()[col][row + 1] instanceof Gas)){
 				map.addTile(col, row + 1, new Gas (col, row + 1, tileSize, tileset.getImage("GasOne"), this, 0));
 				placedThisRound.add(new Gas (col, row + 1, tileSize, tileset.getImage("GasOne"), this, 0));
 				numSquaresToFill--;
 			}
 			//down right
-			if(row > 0 && col < map.getTiles().length - 1 && !map.getTiles()[col + 1][row + 1].isSolid() && !(map.getTiles()[col + 1][row + 1] instanceof Gas)){
+			if(numSquaresToFill > 0 && row > 0 && col < map.getTiles().length - 1 && !map.getTiles()[col + 1][row + 1].isSolid() && !(map.getTiles()[col + 1][row + 1] instanceof Gas)){
 				map.addTile(col + 1, row + 1, new Gas (col + 1, row + 1, tileSize, tileset.getImage("GasOne"), this, 0));
 				placedThisRound.add(new Gas (col + 1, row + 1, tileSize, tileset.getImage("GasOne"), this, 0));
 				numSquaresToFill--;
 			}
 			//down left
-			if(row > 0 && col > 0 && col < map.getTiles().length && !map.getTiles()[col - 1][row + 1].isSolid() && !(map.getTiles()[col - 1][row + 1] instanceof Gas)){
+			if(numSquaresToFill > 0 && row > 0 && col > 0 && col < map.getTiles().length && !map.getTiles()[col - 1][row + 1].isSolid() && !(map.getTiles()[col - 1][row + 1] instanceof Gas)){
 				map.addTile(col - 1, row + 1, new Gas (col - 1, row + 1, tileSize, tileset.getImage("GasOne"), this, 0));
 				placedThisRound.add(new Gas (col - 1, row + 1, tileSize, tileset.getImage("GasOne"), this, 0));
 				numSquaresToFill--;
@@ -296,12 +296,11 @@ public class Level {
 		
 
     if(row < 19){
-		if(!(map.getTiles()[col][row+1] instanceof Water) && !map.getTiles()[col][row+1].isSolid()){
-			water(col, row + 1, map, 4);
+		if(!(map.getTiles()[col][row+1] instanceof Water) && !map.getTiles()[col][row+1].isSolid() && map.getTiles()[col][row+2].isSolid()){
+			water(col, row+1, map, 3);
 		}
-		else if(!(map.getTiles()[col][row+1] instanceof Water) && map.getTiles()[col][row+1].isSolid() && fullness == 4){
-			//error here
-			water(col, row, map, 3);
+		else if(!(map.getTiles()[col][row+1] instanceof Water) && !map.getTiles()[col][row+1].isSolid()){
+			water(col, row + 1, map, 4);
 		}
 		else {
 			if(col+1 < map.getTiles().length && !(map.getTiles()[col+1][row] instanceof Water) && !map.getTiles()[col+1][row].isSolid()) {
