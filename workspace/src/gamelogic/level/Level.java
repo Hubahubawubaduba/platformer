@@ -38,6 +38,8 @@ public class Level {
 
 	private List<PlayerDieListener> dieListeners = new ArrayList<>();
 	private List<PlayerWinListener> winListeners = new ArrayList<>();
+	private ArrayList<Water> waterTiles = new ArrayList<>();
+	private ArrayList<Gas> gasTiles = new ArrayList<>();
 
 	private Mapdata mapdata;
 	private int width;
@@ -45,6 +47,8 @@ public class Level {
 	private int tileSize;
 	private Tileset tileset;
 	public static float GRAVITY = 70;
+	private int num = 0;
+	private int num1 = 0;
 
 	public Level(LevelData leveldata) {
 		this.leveldata = leveldata;
@@ -148,6 +152,10 @@ public class Level {
 		throwPlayerWinEvent();
 	}
 
+	public ArrayList<Water> getWater(){
+		return waterTiles;
+	}
+
 	public void update(float tslf) {
 		if (active) {
 			// Update the player
@@ -164,7 +172,26 @@ public class Level {
 				onPlayerDeath();
 			if (player.getCollisionMatrix()[PhysicsObject.RIG] instanceof Spikes)
 				onPlayerDeath();
-
+			for (int i = 0; i < waterTiles.size(); i++){
+				if(waterTiles.get(i).getHitbox().isIntersecting(player.getHitbox())){
+					player.walkSpeed = 200;
+					num = 1;
+				}
+			}
+			if(num == 0){
+					player.walkSpeed = 400;
+				}
+			num = 0;
+			for (int i = 0; i < gasTiles.size(); i++){
+				if(gasTiles.get(i).getHitbox().isIntersecting(player.getHitbox())){
+					player.jumpPower = 2600;
+					num1 = 1;
+				}
+			}
+			if(num1 == 0){
+					player.jumpPower = 1350;
+				}
+			num1 = 0;
 			for (int i = 0; i < flowers.size(); i++) {
 				if (flowers.get(i).getHitbox().isIntersecting(player.getHitbox())) {
 					if(flowers.get(i).getType() == 1)
@@ -199,6 +226,7 @@ public class Level {
 		map.addTile(col, row, g);
 		numSquaresToFill--;
 		placedThisRound.add(g);
+		gasTiles.add(g);
 
 		while(numSquaresToFill > 0 && placedThisRound.size() > 0){
 			//consider a spot thats in placedthisround.get(0)
@@ -217,48 +245,56 @@ public class Level {
 			if(row > 0 && !map.getTiles()[col][row - 1].isSolid() && !(map.getTiles()[col][row - 1] instanceof Gas)){
 				map.addTile(col, row - 1, new Gas (col, row - 1, tileSize, tileset.getImage("GasOne"), this, 0));
 				placedThisRound.add(new Gas (col, row - 1, tileSize, tileset.getImage("GasOne"), this, 0));
+				gasTiles.add(new Gas (col, row - 1, tileSize, tileset.getImage("GasOne"), this, 0));
 				numSquaresToFill--;
 			}
 			//up and right
 			if(numSquaresToFill > 0 && col < map.getTiles().length - 1 && row > 0 && !map.getTiles()[col + 1][row - 1].isSolid() && !(map.getTiles()[col + 1][row - 1] instanceof Gas)){
 				map.addTile(col + 1, row - 1, new Gas (col + 1, row - 1, tileSize, tileset.getImage("GasOne"), this, 0));
 				placedThisRound.add(new Gas (col + 1, row - 1, tileSize, tileset.getImage("GasOne"), this, 0));
+				gasTiles.add(new Gas (col + 1, row - 1, tileSize, tileset.getImage("GasOne"), this, 0));
 				numSquaresToFill--;
 			}
 			//up and left
 			if(numSquaresToFill > 0 && col > 0 && row > 0 && !map.getTiles()[col - 1][row - 1].isSolid() && !(map.getTiles()[col - 1][row - 1] instanceof Gas)){
 				map.addTile(col - 1, row - 1, new Gas (col - 1, row - 1, tileSize, tileset.getImage("GasOne"), this, 0));
 				placedThisRound.add(new Gas (col - 1, row - 1, tileSize, tileset.getImage("GasOne"), this, 0));
+				gasTiles.add(new Gas (col - 1, row - 1, tileSize, tileset.getImage("GasOne"), this, 0));
 				numSquaresToFill--;
 			}
 			//right
 			if(numSquaresToFill > 0 && col < map.getTiles().length - 1 && !map.getTiles()[col + 1][row].isSolid() && !(map.getTiles()[col + 1][row] instanceof Gas)){
 				map.addTile(col + 1, row, new Gas (col + 1, row, tileSize, tileset.getImage("GasOne"), this, 0));
 				placedThisRound.add(new Gas (col + 1, row, tileSize, tileset.getImage("GasOne"), this, 0));
+				gasTiles.add(new Gas (col + 1, row, tileSize, tileset.getImage("GasOne"), this, 0));
 				numSquaresToFill--;
 			}
 			//left
 			if(numSquaresToFill > 0 && col > 0 && !map.getTiles()[col - 1][row].isSolid() && !(map.getTiles()[col - 1][row] instanceof Gas)){
 				map.addTile(col - 1, row, new Gas (col - 1, row, tileSize, tileset.getImage("GasOne"), this, 0));
 				placedThisRound.add(new Gas (col - 1, row, tileSize, tileset.getImage("GasOne"), this, 0));
+				gasTiles.add(new Gas (col - 1, row, tileSize, tileset.getImage("GasOne"), this, 0));
 				numSquaresToFill--;
 			}
 			//down
 			if(numSquaresToFill > 0 && row > 0 && !map.getTiles()[col][row + 1].isSolid() && !(map.getTiles()[col][row + 1] instanceof Gas)){
 				map.addTile(col, row + 1, new Gas (col, row + 1, tileSize, tileset.getImage("GasOne"), this, 0));
 				placedThisRound.add(new Gas (col, row + 1, tileSize, tileset.getImage("GasOne"), this, 0));
+				gasTiles.add(new Gas (col, row + 1, tileSize, tileset.getImage("GasOne"), this, 0));
 				numSquaresToFill--;
 			}
 			//down right
 			if(numSquaresToFill > 0 && row > 0 && col < map.getTiles().length - 1 && !map.getTiles()[col + 1][row + 1].isSolid() && !(map.getTiles()[col + 1][row + 1] instanceof Gas)){
 				map.addTile(col + 1, row + 1, new Gas (col + 1, row + 1, tileSize, tileset.getImage("GasOne"), this, 0));
 				placedThisRound.add(new Gas (col + 1, row + 1, tileSize, tileset.getImage("GasOne"), this, 0));
+				gasTiles.add(new Gas (col + 1, row + 1, tileSize, tileset.getImage("GasOne"), this, 0));
 				numSquaresToFill--;
 			}
 			//down left
 			if(numSquaresToFill > 0 && row > 0 && col > 0 && col < map.getTiles().length && !map.getTiles()[col - 1][row + 1].isSolid() && !(map.getTiles()[col - 1][row + 1] instanceof Gas)){
 				map.addTile(col - 1, row + 1, new Gas (col - 1, row + 1, tileSize, tileset.getImage("GasOne"), this, 0));
 				placedThisRound.add(new Gas (col - 1, row + 1, tileSize, tileset.getImage("GasOne"), this, 0));
+				gasTiles.add(new Gas (col - 1, row + 1, tileSize, tileset.getImage("GasOne"), this, 0));
 				numSquaresToFill--;
 			}
 			//then check for a gas block around in that order
@@ -275,28 +311,32 @@ public class Level {
 		  //make water (You’ll need modify this to make different kinds of water such as half water and quarter water)
 		  if(fullness == 4){
 			Water w = new Water (col, row, tileSize, tileset.getImage("Falling_water"), this, fullness);
+			waterTiles.add(w);
 			map.addTile(col, row, w);
 			fullness = 3;
 		  }
 		  else if(fullness == 3){
 		 	Water w = new Water (col, row, tileSize, tileset.getImage("Full_water"), this, fullness);
+			waterTiles.add(w);
 			map.addTile(col, row, w);
 		  }
 
 		  if(fullness == 2){
 		 	Water w = new Water (col, row, tileSize, tileset.getImage("Half_water"), this, fullness);
+			waterTiles.add(w);
 			map.addTile(col, row, w);
 		  }
 
 		  if(fullness == 1){
 		 	Water w = new Water (col, row, tileSize, tileset.getImage("Quarter_water"), this, fullness);
+			waterTiles.add(w);
 			map.addTile(col, row, w);
 		  }
 		  
 		
 
     if(row < 19){
-		if(!(map.getTiles()[col][row+1] instanceof Water) && !map.getTiles()[col][row+1].isSolid() && map.getTiles()[col][row+2].isSolid()){
+		if(row < 18 && !(map.getTiles()[col][row+1] instanceof Water) && !map.getTiles()[col][row+1].isSolid() && map.getTiles()[col][row+2].isSolid()){
 			water(col, row+1, map, 3);
 		}
 		else if(!(map.getTiles()[col][row+1] instanceof Water) && !map.getTiles()[col][row+1].isSolid()){

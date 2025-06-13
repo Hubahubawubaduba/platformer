@@ -15,32 +15,15 @@ public class Player extends PhysicsObject{
 	public float jumpPower = 1350;
 
 	private boolean isJumping = false;
+	private boolean canDoubleJump = false;
+	private long lastJumpDownTime = 0;
+	private static final long jumpDownCooldown = 300;
 
 	public Player(float x, float y, Level level) {
 	
 		super(x, y, level.getLevelData().getTileSize(), level.getLevelData().getTileSize(), level);
 		int offset =(int)(level.getLevelData().getTileSize()*0.1); //hitbox is offset by 10% of the player size.
 		this.hitbox = new RectHitbox(this, offset,offset, width -offset, height - offset);
-	}
-
-	@Override
-	public void update(float tslf) {
-		super.update(tslf);
-		
-		movementVector.x = 0;
-		if(PlayerInput.isLeftKeyDown()) {
-			movementVector.x = -walkSpeed;
-		}
-		if(PlayerInput.isRightKeyDown()) {
-			movementVector.x = +walkSpeed;
-		}
-		if(PlayerInput.isJumpKeyDown() && !isJumping) {
-			movementVector.y = -jumpPower;
-			isJumping = true;
-		}
-		
-		isJumping = true;
-		if(collisionMatrix[BOT] != null) isJumping = false;
 	}
 
 	@Override
@@ -60,4 +43,42 @@ public class Player extends PhysicsObject{
 		
 		hitbox.draw(g);
 	}
+
+
+	@Override
+	public void update(float tslf) {
+		super.update(tslf);
+		long currentTime = System.currentTimeMillis();
+
+		movementVector.x = 0;
+		if(PlayerInput.isLeftKeyDown()) {
+			movementVector.x = -walkSpeed;
+		}
+		if(PlayerInput.isRightKeyDown()) {
+			movementVector.x = +walkSpeed;
+		}
+		if(PlayerInput.isJumpKeyDown() && (!isJumping || canDoubleJump) && (currentTime - lastJumpDownTime > jumpDownCooldown)) {
+			movementVector.y = -jumpPower;
+			if(isJumping == true){
+				canDoubleJump = false;
+			}
+			isJumping = true;		
+			lastJumpDownTime = currentTime;
+		}
+		if(PlayerInput.isJumpKeyDown() && (!isJumping || canDoubleJump) && (currentTime - lastJumpDownTime > jumpDownCooldown)) {
+			movementVector.y = -jumpPower;
+			if(isJumping == true){
+				canDoubleJump = false;
+			}
+			isJumping = true;	
+			 lastJumpDownTime = currentTime;	
+		}
+		isJumping = true;
+		if(collisionMatrix[BOT] != null){
+			isJumping = false;
+			canDoubleJump = true;
+		}
+	} 
 }
+
+	
